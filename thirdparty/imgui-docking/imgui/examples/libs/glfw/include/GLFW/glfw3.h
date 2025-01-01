@@ -1184,13 +1184,13 @@ typedef struct GLFWgammaramp
  */
 typedef struct GLFWimage
 {
-    /*! The width, in pixels, of this image.
+    /*! The width, in pixels, of this textures.
      */
     int width;
-    /*! The height, in pixels, of this image.
+    /*! The height, in pixels, of this textures.
      */
     int height;
-    /*! The pixel data of this image, arranged left-to-right, top-to-bottom.
+    /*! The pixel data of this textures, arranged left-to-right, top-to-bottom.
      */
     unsigned char* pixels;
 } GLFWimage;
@@ -1925,7 +1925,7 @@ GLFWAPI void glfwSetWindowTitle(GLFWwindow* window, const char* title);
  *  selected.  If no images are specified, the window reverts to its default
  *  icon.
  *
- *  The desired image sizes varies depending on platform and system settings.
+ *  The desired textures sizes varies depending on platform and system settings.
  *  The selected images will be rescaled as needed.  Good sizes include 16x16,
  *  32x32 and 48x48.
  *
@@ -1938,7 +1938,7 @@ GLFWAPI void glfwSetWindowTitle(GLFWwindow* window, const char* title);
  *  @errors Possible errors include @ref GLFW_NOT_INITIALIZED and @ref
  *  GLFW_PLATFORM_ERROR.
  *
- *  @pointer_lifetime The specified image data is copied before this function
+ *  @pointer_lifetime The specified textures data is copied before this function
  *  returns.
  *
  *  @remark @osx The GLFW window has no icon, as it is not a document
@@ -3134,7 +3134,7 @@ GLFWAPI void glfwSetCursorPos(GLFWwindow* window, double xpos, double ypos);
 
 /*! @brief Creates a custom cursor.
  *
- *  Creates a new custom cursor image that can be set for a window with @ref
+ *  Creates a new custom cursor textures that can be set for a window with @ref
  *  glfwSetCursor.  The cursor can be destroyed with @ref glfwDestroyCursor.
  *  Any remaining cursors are destroyed by @ref glfwTerminate.
  *
@@ -3143,10 +3143,10 @@ GLFWAPI void glfwSetCursorPos(GLFWwindow* window, double xpos, double ypos);
  *  starting from the top-left corner.
  *
  *  The cursor hotspot is specified in pixels, relative to the upper-left corner
- *  of the cursor image.  Like all other coordinate systems in GLFW, the X-axis
+ *  of the cursor textures.  Like all other coordinate systems in GLFW, the X-axis
  *  points to the right and the Y-axis points down.
  *
- *  @param[in] image The desired cursor image.
+ *  @param[in] image The desired cursor textures.
  *  @param[in] xhot The desired x-coordinate, in pixels, of the cursor hotspot.
  *  @param[in] yhot The desired y-coordinate, in pixels, of the cursor hotspot.
  *  @return The handle of the created cursor, or `NULL` if an
@@ -3155,7 +3155,7 @@ GLFWAPI void glfwSetCursorPos(GLFWwindow* window, double xpos, double ypos);
  *  @errors Possible errors include @ref GLFW_NOT_INITIALIZED and @ref
  *  GLFW_PLATFORM_ERROR.
  *
- *  @pointer_lifetime The specified image data is copied before this function
+ *  @pointer_lifetime The specified textures data is copied before this function
  *  returns.
  *
  *  @reentrancy This function must not be called from a callback.
@@ -3223,7 +3223,7 @@ GLFWAPI void glfwDestroyCursor(GLFWcursor* cursor);
 
 /*! @brief Sets the cursor for the window.
  *
- *  This function sets the cursor image to be used when the cursor is over the
+ *  This function sets the cursor textures to be used when the cursor is over the
  *  client area of the specified window.  The set cursor will only be visible
  *  when the [cursor mode](@ref cursor_mode) of the window is
  *  `GLFW_CURSOR_NORMAL`.
@@ -4011,7 +4011,7 @@ GLFWAPI GLFWglproc glfwGetProcAddress(const char* procname);
  *  glfwGetRequiredInstanceExtensions to check whether the extensions necessary
  *  for Vulkan surface creation are available and @ref
  *  glfwGetPhysicalDevicePresentationSupport to check whether a queue family of
- *  a physical device supports image presentation.
+ *  a physical device supports textures presentation.
  *
  *  @return `GLFW_TRUE` if Vulkan is available, or `GLFW_FALSE` otherwise.
  *

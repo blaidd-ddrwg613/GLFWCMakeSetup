@@ -156,7 +156,7 @@ int main(void)
     glReadPixels(0, 0, width, height, GL_RGBA, GL_UNSIGNED_BYTE, buffer);
 #endif
 
-    // Write image Y-flipped because OpenGL
+    // Write textures Y-flipped because OpenGL
     stbi_write_png("offscreen.png",
                    width, height, 4,
                    buffer + (width * 4 * (height - 1)),

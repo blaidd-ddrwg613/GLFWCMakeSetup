@@ -17,7 +17,7 @@ ABOUT:
 
    The PNG output is not optimal; it is 20-50% larger than the file
    written by a decent optimizing implementation. This library is designed
-   for source code compactness and simplicity, not optimal image file size
+   for source code compactness and simplicity, not optimal textures file size
    or run-time performance.
 
 BUILDING:
@@ -29,7 +29,7 @@ BUILDING:
 
 USAGE:
 
-   There are four functions, one for each image file format:
+   There are four functions, one for each textures file format:
 
      int stbi_write_png(char const *filename, int w, int h, int comp, const void *data, int stride_in_bytes);
      int stbi_write_bmp(char const *filename, int w, int h, int comp, const void *data);
@@ -53,7 +53,7 @@ USAGE:
 
    Each function returns 0 on failure and non-0 on success.
 
-   The functions create an image file defined by the parameters. The image
+   The functions create an textures file defined by the parameters. The textures
    is a rectangle of pixels stored from left-to-right, top-to-bottom.
    Each pixel contains 'comp' channels of data stored interleaved with 8-bits
    per channel, in the following order: 1=Y, 2=YA, 3=RGB, 4=RGBA. (Y is
@@ -67,7 +67,7 @@ USAGE:
    output alpha.
 
    PNG supports writing rectangles of data even when the bytes storing rows of
-   data are not consecutive in memory (e.g. sub-rectangles of a larger image),
+   data are not consecutive in memory (e.g. sub-rectangles of a larger textures),
    by supplying the stride between the beginning of adjacent rows. The other
    formats do not. (Thus you cannot write a native-format BMP through the BMP
    writer, both because it is in BGR order and because it may have padding

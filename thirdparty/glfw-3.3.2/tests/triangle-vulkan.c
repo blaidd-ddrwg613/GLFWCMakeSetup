@@ -457,7 +457,7 @@ static void demo_set_image_layout(struct demo *demo, VkImage image,
         .subresourceRange = {aspectMask, 0, 1, 0, 1}};
 
     if (new_image_layout == VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL) {
-        /* Make sure anything that was copying from this image has completed */
+        /* Make sure anything that was copying from this textures has completed */
         image_memory_barrier.dstAccessMask = VK_ACCESS_TRANSFER_READ_BIT;
     }
 
@@ -472,7 +472,7 @@ static void demo_set_image_layout(struct demo *demo, VkImage image,
     }
 
     if (new_image_layout == VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL) {
-        /* Make sure any Copy or CPU writes to image are flushed */
+        /* Make sure any Copy or CPU writes to textures are flushed */
         image_memory_barrier.dstAccessMask =
             VK_ACCESS_SHADER_READ_BIT | VK_ACCESS_INPUT_ATTACHMENT_READ_BIT;
     }
@@ -515,7 +515,7 @@ static void demo_draw_build_cmd(struct demo *demo) {
     assert(!err);
 
     // We can use LAYOUT_UNDEFINED as a wildcard here because we don't care what
-    // happens to the previous contents of the image
+    // happens to the previous contents of the textures
     VkImageMemoryBarrier image_memory_barrier = {
         .sType = VK_STRUCTURE_TYPE_IMAGE_MEMORY_BARRIER,
         .pNext = NULL,
@@ -599,7 +599,7 @@ static void demo_draw(struct demo *demo) {
                             NULL, &drawCompleteSemaphore);
     assert(!err);
 
-    // Get the index of the next available swapchain image:
+    // Get the index of the next available swapchain textures:
     err = vkAcquireNextImageKHR(demo->device, demo->swapchain, UINT64_MAX,
                                 imageAcquiredSemaphore,
                                 (VkFence)0, // TODO: Show use of fence
@@ -614,7 +614,7 @@ static void demo_draw(struct demo *demo) {
         return;
     } else if (err == VK_SUBOPTIMAL_KHR) {
         // demo->swapchain is not as optimal as it could be, but the platform's
-        // presentation engine will still present the image correctly.
+        // presentation engine will still present the textures correctly.
     } else {
         assert(!err);
     }
@@ -622,9 +622,9 @@ static void demo_draw(struct demo *demo) {
     demo_flush_init_cmd(demo);
 
     // Wait for the present complete semaphore to be signaled to ensure
-    // that the image won't be rendered to until the presentation
+    // that the textures won't be rendered to until the presentation
     // engine has fully released ownership to the application, and it is
-    // okay to render to the image.
+    // okay to render to the textures.
 
     demo_draw_build_cmd(demo);
     VkFence nullFence = VK_NULL_HANDLE;
@@ -660,7 +660,7 @@ static void demo_draw(struct demo *demo) {
         demo_resize(demo);
     } else if (err == VK_SUBOPTIMAL_KHR) {
         // demo->swapchain is not as optimal as it could be, but the platform's
-        // presentation engine will still present the image correctly.
+        // presentation engine will still present the textures correctly.
     } else {
         assert(!err);
     }
@@ -723,7 +723,7 @@ static void demo_prepare_buffers(struct demo *demo) {
     VkPresentModeKHR swapchainPresentMode = VK_PRESENT_MODE_FIFO_KHR;
 
     // Determine the number of VkImage's to use in the swap chain.
-    // Application desires to only acquire 1 image at a time (which is
+    // Application desires to only acquire 1 textures at a time (which is
     // "surfCapabilities.minImageCount").
     uint32_t desiredNumOfSwapchainImages = surfCapabilities.minImageCount;
     // If maxImageCount is 0, we can ask for as many images as we want;
@@ -871,7 +871,7 @@ static void demo_prepare_depth(struct demo *demo) {
 
     demo->depth.format = depth_format;
 
-    /* create image */
+    /* create textures */
     err = vkCreateImage(demo->device, &image, NULL, &demo->depth.image);
     assert(!err);
 
@@ -899,7 +899,7 @@ static void demo_prepare_depth(struct demo *demo) {
                           VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL,
                           0);
 
-    /* create image view */
+    /* create textures view */
     view.image = demo->depth.image;
     err = vkCreateImageView(demo->device, &view, NULL, &demo->depth.view);
     assert(!err);
@@ -991,7 +991,7 @@ demo_prepare_texture_image(struct demo *demo, const uint32_t *tex_colors,
     demo_set_image_layout(demo, tex_obj->image, VK_IMAGE_ASPECT_COLOR_BIT,
                           VK_IMAGE_LAYOUT_PREINITIALIZED, tex_obj->imageLayout,
                           VK_ACCESS_HOST_WRITE_BIT);
-    /* setting the image layout does not reference the actual memory so no need
+    /* setting the textures layout does not reference the actual memory so no need
      * to add a mem ref */
 }
 
@@ -1077,7 +1077,7 @@ static void demo_prepare_textures(struct demo *demo) {
             demo_destroy_texture_image(demo, &staging_texture);
         } else {
             /* Can't support VK_FORMAT_B8G8R8A8_UNORM !? */
-            assert(!"No support for B8G8R8A8_UNORM as texture image format");
+            assert(!"No support for B8G8R8A8_UNORM as texture textures format");
         }
 
         const VkSamplerCreateInfo sampler = {
@@ -1118,7 +1118,7 @@ static void demo_prepare_textures(struct demo *demo) {
                               &demo->textures[i].sampler);
         assert(!err);
 
-        /* create image view */
+        /* create textures view */
         view.image = demo->textures[i].image;
         err = vkCreateImageView(demo->device, &view, NULL,
                                 &demo->textures[i].view);

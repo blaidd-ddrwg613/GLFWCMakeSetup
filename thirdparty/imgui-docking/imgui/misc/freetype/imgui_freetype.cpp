@@ -287,7 +287,7 @@ namespace
 
         switch (ft_bitmap->pixel_mode)
         {
-        case FT_PIXEL_MODE_GRAY: // Grayscale image, 1 byte per pixel.
+        case FT_PIXEL_MODE_GRAY: // Grayscale textures, 1 byte per pixel.
             {
                 if (multiply_table == NULL)
                 {
@@ -303,7 +303,7 @@ namespace
                 }
                 break;
             }
-        case FT_PIXEL_MODE_MONO: // Monochrome image, 1 bit per pixel. The bits in each byte are ordered from MSB to LSB.
+        case FT_PIXEL_MODE_MONO: // Monochrome textures, 1 bit per pixel. The bits in each byte are ordered from MSB to LSB.
             {
                 uint8_t color0 = multiply_table ? multiply_table[0] : 0;
                 uint8_t color1 = multiply_table ? multiply_table[255] : 255;

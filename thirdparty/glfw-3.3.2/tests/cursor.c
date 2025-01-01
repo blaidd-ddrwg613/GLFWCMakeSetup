@@ -23,10 +23,10 @@
 //
 //========================================================================
 //
-// This test provides an interface to the cursor image and cursor mode
+// This test provides an interface to the cursor textures and cursor mode
 // parts of the API.
 //
-// Custom cursor image generation by urraka.
+// Custom cursor textures generation by urraka.
 //
 //========================================================================
 

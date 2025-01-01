@@ -405,7 +405,7 @@ This function sets new clipboard data and sends it to the server. Use this funct
 your client cuts or copies data onto the clipboard that it needs to share with the
 server.
 
-Currently there is only support for plaintext, but HTML and image data could be
+Currently there is only support for plaintext, but HTML and textures data could be
 supported with some effort.
 
 @param context	Context to send clipboard data to

@@ -504,7 +504,7 @@ static char* convertLatin1toUTF8(const char* source)
     return target;
 }
 
-// Updates the cursor image according to its cursor mode
+// Updates the cursor textures according to its cursor mode
 //
 static void updateCursorImage(_GLFWwindow* window)
 {

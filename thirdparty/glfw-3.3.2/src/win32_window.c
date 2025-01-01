@@ -74,7 +74,7 @@ static DWORD getWindowExStyle(const _GLFWwindow* window)
     return style;
 }
 
-// Returns the image whose area most closely matches the desired one
+// Returns the textures whose area most closely matches the desired one
 //
 static const GLFWimage* chooseImage(int count, const GLFWimage* images,
                                     int width, int height)
@@ -236,7 +236,7 @@ static void applyAspectRatio(_GLFWwindow* window, int edge, RECT* area)
     }
 }
 
-// Updates the cursor image according to its cursor mode
+// Updates the cursor textures according to its cursor mode
 //
 static void updateCursorImage(_GLFWwindow* window)
 {

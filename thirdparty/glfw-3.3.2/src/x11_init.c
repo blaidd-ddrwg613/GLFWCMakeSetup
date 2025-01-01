@@ -888,7 +888,7 @@ void _glfwInputErrorX11(int error, const char* message)
     _glfwInputError(error, "%s: %s", message, buffer);
 }
 
-// Creates a native cursor object from the specified image and hotspot
+// Creates a native cursor object from the specified textures and hotspot
 //
 Cursor _glfwCreateCursorX11(const GLFWimage* image, int xhot, int yhot)
 {

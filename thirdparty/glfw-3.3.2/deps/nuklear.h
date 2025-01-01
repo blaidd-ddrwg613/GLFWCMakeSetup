@@ -2705,7 +2705,7 @@ NK_API void nk_group_scrolled_end(struct nk_context*);
 /// collapsable UI sections. All trees are started by calling of the
 /// `nk_tree_xxx_push_tree` functions and ended by calling one of the
 /// `nk_tree_xxx_pop_xxx()` functions. Each starting functions takes a title label
-/// and optionally an image to be displayed and the initial collapse state from
+/// and optionally an textures to be displayed and the initial collapse state from
 /// the nk_collapse_states section.<br /><br />
 ///
 /// The runtime state of the tree is either stored outside the library by the caller
@@ -2745,13 +2745,13 @@ NK_API void nk_group_scrolled_end(struct nk_context*);
 /// nk_tree_push                | Start a collapsable UI section with internal state management
 /// nk_tree_push_id             | Start a collapsable UI section with internal state management callable in a look
 /// nk_tree_push_hashed         | Start a collapsable UI section with internal state management with full control over internal unique ID use to store state
-/// nk_tree_image_push          | Start a collapsable UI section with image and label header
-/// nk_tree_image_push_id       | Start a collapsable UI section with image and label header and internal state management callable in a look
-/// nk_tree_image_push_hashed   | Start a collapsable UI section with image and label header and internal state management with full control over internal unique ID use to store state
+/// nk_tree_image_push          | Start a collapsable UI section with textures and label header
+/// nk_tree_image_push_id       | Start a collapsable UI section with textures and label header and internal state management callable in a look
+/// nk_tree_image_push_hashed   | Start a collapsable UI section with textures and label header and internal state management with full control over internal unique ID use to store state
 /// nk_tree_pop                 | Ends a collapsable UI section
 //
 /// nk_tree_state_push          | Start a collapsable UI section with external state management
-/// nk_tree_state_image_push    | Start a collapsable UI section with image and label header and external state management
+/// nk_tree_state_image_push    | Start a collapsable UI section with textures and label header and external state management
 /// nk_tree_state_pop           | Ends a collapsabale UI section
 ///
 /// #### nk_tree_type
@@ -2820,7 +2820,7 @@ NK_API void nk_group_scrolled_end(struct nk_context*);
 */
 NK_API int nk_tree_push_hashed(struct nk_context*, enum nk_tree_type, const char *title, enum nk_collapse_states initial_state, const char *hash, int len,int seed);
 /*/// #### nk_tree_image_push
-/// Start a collapsable UI section with image and label header
+/// Start a collapsable UI section with textures and label header
 /// !!! WARNING
 ///     To keep track of the runtime tree collapsable state this function uses
 ///     defines `__FILE__` and `__LINE__` to generate a unique ID. If you want
@@ -2843,7 +2843,7 @@ NK_API int nk_tree_push_hashed(struct nk_context*, enum nk_tree_type, const char
 */
 #define nk_tree_image_push(ctx, type, img, title, state) nk_tree_image_push_hashed(ctx, type, img, title, state, NK_FILE_LINE,nk_strlen(NK_FILE_LINE),__LINE__)
 /*/// #### nk_tree_image_push_id
-/// Start a collapsable UI section with image and label header and internal state
+/// Start a collapsable UI section with textures and label header and internal state
 /// management callable in a look
 ///
 /// ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~c
@@ -2911,7 +2911,7 @@ NK_API void nk_tree_pop(struct nk_context*);
 */
 NK_API int nk_tree_state_push(struct nk_context*, enum nk_tree_type, const char *title, enum nk_collapse_states *state);
 /*/// #### nk_tree_state_image_push
-/// Start a collapsable UI section with image and label header and external state management
+/// Start a collapsable UI section with textures and label header and external state management
 /// ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~c
 /// int nk_tree_state_image_push(struct nk_context*, enum nk_tree_type, struct nk_image, const char *title, enum nk_collapse_states *state);
 /// ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -3775,11 +3775,11 @@ NK_API const char* nk_utf_at(const char *buffer, int length, int index, nk_rune 
     `nk_font_atlas_cleanup` after the baking process is over (after calling nk_font_atlas_end).
 
     As soon as you added all fonts you wanted you can now start the baking process
-    for every selected glyph to image by calling `nk_font_atlas_bake`.
-    The baking process returns image memory, width and height which can be used to
-    either create your own image object or upload it to any graphics library.
+    for every selected glyph to textures by calling `nk_font_atlas_bake`.
+    The baking process returns textures memory, width and height which can be used to
+    either create your own textures object or upload it to any graphics library.
     No matter which case you finally have to call `nk_font_atlas_end` which
-    will free all temporary memory including the font atlas image so make sure
+    will free all temporary memory including the font atlas textures so make sure
     you created our texture beforehand. `nk_font_atlas_end` requires a handle
     to your font texture or object and optionally fills a `struct nk_draw_null_texture`
     which can be used for the optional vertex output. If you don't want it just
@@ -10271,7 +10271,7 @@ nk_draw_list_add_text(struct nk_draw_list *list, const struct nk_user_font *font
     glyph_len = nk_utf_decode(text, &unicode, len);
     if (!glyph_len) return;
 
-    /* draw every glyph image */
+    /* draw every glyph textures */
     fg.a = (nk_byte)((float)fg.a * list->config.global_alpha);
     while (text_len < len && glyph_len) {
         float gx, gy, gh, gw;
@@ -10283,7 +10283,7 @@ nk_draw_list_add_text(struct nk_draw_list *list, const struct nk_user_font *font
         font->query(font->userdata, font_height, &g, unicode,
                     (next == NK_UTF_INVALID) ? '\0' : next);
 
-        /* calculate and draw glyph drawing rectangle and image */
+        /* calculate and draw glyph drawing rectangle and textures */
         gx = x + g.offset.x;
         gy = rect.y + g.offset.y;
         gw = g.width; gh = g.height;
@@ -13670,20 +13670,20 @@ nk_font_atlas_bake(struct nk_font_atlas *atlas, int *width, int *height,
         atlas->config, atlas->font_num, &atlas->temporary))
         goto failed;
 
-    /* allocate memory for the baked image font atlas */
+    /* allocate memory for the baked textures font atlas */
     atlas->pixel = atlas->temporary.alloc(atlas->temporary.userdata,0, img_size);
     NK_ASSERT(atlas->pixel);
     if (!atlas->pixel)
         goto failed;
 
-    /* bake glyphs and custom white pixel into image */
+    /* bake glyphs and custom white pixel into textures */
     nk_font_bake(baker, atlas->pixel, *width, *height,
         atlas->glyphs, atlas->glyph_count, atlas->config, atlas->font_num);
     nk_font_bake_custom_data(atlas->pixel, *width, *height, atlas->custom,
             nk_custom_cursor_data, NK_CURSOR_DATA_W, NK_CURSOR_DATA_H, '.', 'X');
 
     if (fmt == NK_FONT_ATLAS_RGBA32) {
-        /* convert alpha8 image into rgba32 image */
+        /* convert alpha8 textures into rgba32 textures */
         void *img_rgba = atlas->temporary.alloc(atlas->temporary.userdata,0,
                             (nk_size)(*width * *height * 4));
         NK_ASSERT(img_rgba);
@@ -18266,7 +18266,7 @@ nk_tree_state_base(struct nk_context *ctx, enum nk_tree_type type,
         button, 0, style->font);
 
     if (img) {
-        /* draw optional image icon */
+        /* draw optional textures icon */
         sym.x = sym.x + sym.w + 4 * item_spacing.x;
         nk_draw_image(&win->buffer, sym, img, nk_white);
         sym.w = style->font->height + style->tab.spacing.x;}
@@ -24771,7 +24771,7 @@ nk_combo_begin_image(struct nk_context *ctx, struct nk_image img, struct nk_vec2
         content.w = button.w - 2 * style->combo.button.padding.x;
         content.h = button.h - 2 * style->combo.button.padding.y;
 
-        /* draw image */
+        /* draw textures */
         bounds.h = header.h - 2 * style->combo.content_padding.y;
         bounds.y = header.y + style->combo.content_padding.y;
         bounds.x = header.x + style->combo.content_padding.x;
@@ -24858,7 +24858,7 @@ nk_combo_begin_image_text(struct nk_context *ctx, const char *selected, int len,
         nk_draw_button_symbol(&win->buffer, &button, &content, ctx->last_widget_state,
             &ctx->style.combo.button, sym, style->font);
 
-        /* draw image */
+        /* draw textures */
         image.x = header.x + style->combo.content_padding.x;
         image.y = header.y + style->combo.content_padding.y;
         image.h = header.h - 2 * style->combo.content_padding.y;
