@@ -1,152 +1,221 @@
-#define GLFW_INCLUDE_NONE
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
 #include <iostream>
-#include <gl2d/gl2d.h>
-#include <openglErrorReporting.h>
 
-#include "imgui.h"
-#include "backends/imgui_impl_glfw.h"
-#include "backends/imgui_impl_opengl3.h"
-#include "imguiThemes.h"
-
-static void error_callback(int error, const char *description)
-{
-	std::cout << "Error: " <<  description << "\n";
-}
-
+void framebuffer_size_callback(GLFWwindow *window, int width, int height);
+void processInput(GLFWwindow *window);
 
 int main(void)
 {
+    // Init GLFW and set OpenGL version/profile
+    glfwInit();
+    glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
+    glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
+    glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 
-	glfwSetErrorCallback(error_callback);
+    // We create the GLFW window
+    GLFWwindow* window = glfwCreateWindow(800, 600, "GLFW Window", NULL, NULL);
+    if (window == NULL)
+    {
+        std::cout << "Failed to create glfw window" << "\n";
+        glfwTerminate();
+        return -1;
+    }
+    glfwMakeContextCurrent(window);
+    glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
 
-	if (!glfwInit())
-		exit(EXIT_FAILURE);
+    // Load the OpenGL function pointers
+    if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress))
+    {
+        std::cout << "Failed to initialize GLAD" << std::endl;
+        return -1;
+    }
 
-	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
-	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
+    // Shaders
+    const char *vertexShaderSource = "#version 330 core\n"
+                                     "layout (location = 0) in vec3 aPos;\n"
+                                     "void main()\n"
+                                     "{\n"
+                                     "   gl_Position = vec4(aPos.x, aPos.y, aPos.z, 1.0);\n"
+                                     "}\0";
 
-#ifdef __APPLE__
-	glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, 1);
-	glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
-	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
-	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
-#endif
+    const char *fragmentShaderSource = "#version 330 core\n"
+                                       "out vec4 FragColor;\n"
+                                       "void main()\n"
+                                       "{\n"
+                                       "   FragColor = vec4(1.0f, 0.5f, 0.2f, 1.0f);\n"
+                                       "}\n\0";
 
-	GLFWwindow *window = glfwCreateWindow(640, 480, "Simple example", NULL, NULL);
-	if (!window)
-	{
-		glfwTerminate();
-		exit(EXIT_FAILURE);
-	}
-
-	glfwMakeContextCurrent(window);
-	if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress))
-	{
-		glfwTerminate();
-		exit(EXIT_FAILURE);
-	}
-	
-	enableReportGlErrors();
-	
-	//glfwSwapInterval(1); //vsync
-
-
-#pragma region imgui
-#if REMOVE_IMGUI == 0
-	ImGui::CreateContext();
-	//ImGui::StyleColorsDark();				//you can use whatever imgui theme you like!
-	//imguiThemes::yellow();
-	//imguiThemes::gray();
-	//imguiThemes::green();
-	imguiThemes::red();
-	//imguiThemes::embraceTheDarkness();
-
-	ImGuiIO &io = ImGui::GetIO(); (void)io;
-	io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;
-	//io.ConfigFlags |= ImGuiConfigFlags_NavEnableGamepad;      // Enable Gamepad Controls
-	io.ConfigFlags |= ImGuiConfigFlags_DockingEnable;           // Enable Docking
-	io.ConfigFlags |= ImGuiConfigFlags_ViewportsEnable;         // Enable Multi-Viewport / Platform Windows
-	//io.ConfigViewportsNoAutoMerge = true;
-	//io.ConfigViewportsNoTaskBarIcon = true;
-
-	io.FontGlobalScale = 2.0f; //make text bigger please!
-
-	ImGuiStyle &style = ImGui::GetStyle();
-	if (io.ConfigFlags & ImGuiConfigFlags_ViewportsEnable)
-	{
-		//style.WindowRounding = 0.0f;
-		style.Colors[ImGuiCol_WindowBg].w = 0.f;
-		style.Colors[ImGuiCol_DockingEmptyBg].w = 0.f;
-	}
-
-	ImGui_ImplGlfw_InitForOpenGL(window, true);
-	ImGui_ImplOpenGL3_Init("#version 330");
-#endif
-#pragma endregion
+    const char *fragmentShaderSource2 = "#version 330 core\n"
+                                       "out vec4 FragColor;\n"
+                                       "void main()\n"
+                                       "{\n"
+                                       "   FragColor = vec4(1.0f, 1.0f, 0.0f, 1.0f);\n"
+                                       "}\n\0";
 
 
+    unsigned int vertexShader;
+    vertexShader = glCreateShader(GL_VERTEX_SHADER);
+    glShaderSource(vertexShader, 1, &vertexShaderSource, NULL);
+    glCompileShader(vertexShader);
 
-	gl2d::init();
-	gl2d::Renderer2D renderer;
-	renderer.create();
+    int success;
+    char infoLog[512];
+    glGetShaderiv(vertexShader, GL_COMPILE_STATUS, &success);
 
-	while (!glfwWindowShouldClose(window))
-	{
-		int width = 0, height = 0;
-		glfwGetFramebufferSize(window, &width, &height);
-		glViewport(0, 0, width, height);
-		glClear(GL_COLOR_BUFFER_BIT);
+    if (!success)
+    {
+        glGetShaderInfoLog(vertexShader, 512, NULL, infoLog);
+        std::cout << "ERROR::SHADER::VERTEX::COMPILATION\n" << infoLog << "\n";
+    }
 
-	#pragma region imgui
-		ImGui_ImplOpenGL3_NewFrame();
-		ImGui_ImplGlfw_NewFrame();
-		ImGui::NewFrame();
-		ImGui::DockSpaceOverViewport(ImGui::GetMainViewport());
-	#pragma endregion
+    unsigned int fragmentShader, fragmentShader2;
+    fragmentShader =glCreateShader(GL_FRAGMENT_SHADER);
+    fragmentShader2 =glCreateShader(GL_FRAGMENT_SHADER);
+    glShaderSource(fragmentShader, 1, &fragmentShaderSource, NULL);
+    glShaderSource(fragmentShader2, 1, &fragmentShaderSource2, NULL);
+    glCompileShader(fragmentShader);
+    glCompileShader(fragmentShader2);
+    glGetShaderiv(fragmentShader, GL_COMPILE_STATUS, &success);
+    if (!success)
+    {
+        glGetShaderInfoLog(fragmentShader, 512, NULL, infoLog);
+        std::cout << "ERROR::SHADER::FRAGMENT::COMPILATION\n" << infoLog << "\n";
+    }
+    glGetShaderiv(fragmentShader2, GL_COMPILE_STATUS, &success);
+    if (!success)
+    {
+        glGetShaderInfoLog(fragmentShader, 512, NULL, infoLog);
+        std::cout << "ERROR::SHADER::FRAGMENT::COMPILATION\n" << infoLog << "\n";
+    }
 
+    // Create Shader Program
+    unsigned int shaderProgram, shaderProgram2;
+    shaderProgram = glCreateProgram();
+    shaderProgram2 = glCreateProgram();
+    glAttachShader(shaderProgram, vertexShader);
+    glAttachShader(shaderProgram2, vertexShader);
+    glAttachShader(shaderProgram, fragmentShader);
+    glAttachShader(shaderProgram2, fragmentShader2);
+    glLinkProgram(shaderProgram);
+    glLinkProgram(shaderProgram2);
+    glGetProgramiv(shaderProgram, GL_LINK_STATUS, &success);
+    if(!success) {
+        glGetProgramInfoLog(shaderProgram, 512, NULL, infoLog);
+        std::cout << "ERROR::SHADER::PROGRAM::FAILED\n" << infoLog << "\n";
+    }
+    glGetProgramiv(shaderProgram2, GL_LINK_STATUS, &success);
+    if(!success) {
+        glGetProgramInfoLog(shaderProgram, 512, NULL, infoLog);
+        std::cout << "ERROR::SHADER::PROGRAM::FAILED\n" << infoLog << "\n";
+    }
 
-		renderer.updateWindowMetrics(width, height);
+    glDeleteShader(vertexShader);
+    glDeleteShader(fragmentShader);
+    glDeleteShader(fragmentShader2);
 
-		renderer.renderRectangle({0,0, 100, 100}, Colors_Green);
+    // Triangle vertices
+    float vertices[] =
+            {
+            // First Triangle
+            -0.5f,-0.5f,0.0f,
+            0.5f,-0.5f,0.0f,
+            0.0f,0.5f,0.0f,
+            };
 
-		renderer.flush();
+    // Second Triangle
+    float triangle2[] =
+            {
+                    0.5f,-0.5f,0.0f,
+                    1.0f,0.0f,0.0f,
+                    0.5f,0.5f,0.0f
+            };
 
+    // Element Buffer Vertices
+    float vertices2[] =
+            {
+            0.5f,  0.5f, 0.0f,  // top right
+            0.5f, -0.5f, 0.0f,  // bottom right
+            -0.5f, -0.5f, 0.0f,  // bottom left
+            -0.5f,  0.5f, 0.0f   // top left
+            };
+    unsigned int indices[] =
+            {
+            0,1,3,
+            1,2,3
+            };
 
-		ImGui::Begin("Test");
-		ImGui::Text("Hello world!");
-		ImGui::Button("Press me!");
-		ImGui::End();
+    unsigned int VBOs[2],VAOs[2],EBO;
 
+    glGenVertexArrays(2, VAOs);
+    glGenBuffers(2, VBOs);
+    glGenBuffers(1, &EBO);
 
-	#pragma region imgui
-		ImGui::Render();
-		int display_w, display_h;
-		glfwGetFramebufferSize(window, &display_w, &display_h);
-		glViewport(0, 0, display_w, display_h);
-		ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
+    // First Triangle
+    glBindVertexArray(VAOs[0]);
+    glBindBuffer(GL_ARRAY_BUFFER, VBOs[0]);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(vertices),vertices, GL_STATIC_DRAW);
+    glEnableVertexAttribArray(0);
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);	// Vertex attributes stay the same
+    glEnableVertexAttribArray(0);
+    // Second Triangle
+    glBindVertexArray(VAOs[1]);
+    glBindBuffer(GL_ARRAY_BUFFER, VBOs[1]);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(triangle2), triangle2, GL_STATIC_DRAW);
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);	// Vertex attributes stay the same
+    glEnableVertexAttribArray(0);
+    glEnableVertexAttribArray(0);
 
-		// Update and Render additional Platform Windows
-		// (Platform functions may change the current OpenGL context, so we save/restore it to make it easier to paste this code elsewhere.
-		//  For this specific demo app we could also call glfwMakeContextCurrent(window) directly)
-		if (io.ConfigFlags & ImGuiConfigFlags_ViewportsEnable)
-		{
-			GLFWwindow *backup_current_context = glfwGetCurrentContext();
-			ImGui::UpdatePlatformWindows();
-			ImGui::RenderPlatformWindowsDefault();
-			glfwMakeContextCurrent(backup_current_context);
-		}
-	#pragma endregion
+//    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
+//    glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
 
-		glfwSwapBuffers(window);
-		glfwPollEvents();
-	}
+    // Enable wireframe mode
+//    glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 
-	glfwDestroyWindow(window);
+    // Main Loop
+    while (!glfwWindowShouldClose(window))
+    {
+        // Input
+        processInput(window);
 
-	glfwTerminate();
+        // Rendering
+        glClearColor(0.2, 0.3, 0.3, 1.0);
+        glClear(GL_COLOR_BUFFER_BIT);
 
-	return 0;
+        glUseProgram(shaderProgram);
+        // Draw First Triangle
+        glBindVertexArray(VAOs[0]);
+        glDrawArrays(GL_TRIANGLES,0, 3); // To draw two triangles out of the same array we change the 3 to 6
+        // Draw second triangle
+        glUseProgram(shaderProgram2);
+        glBindVertexArray(VAOs[1]);
+        glDrawArrays(GL_TRIANGLES,0,3);
+
+//        glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
+
+        // Events and swap buffers
+        glfwSwapBuffers(window);
+        glfwPollEvents();
+    }
+
+    glDeleteVertexArrays(2, VAOs);
+    glDeleteBuffers(2, VBOs);
+    glDeleteProgram(shaderProgram);
+
+    glfwTerminate();
+    return 0;
+}
+
+void framebuffer_size_callback(GLFWwindow *window, int width, int height)
+{
+    glViewport(0, 0, width, height);
+}
+
+void processInput(GLFWwindow *window)
+{
+    if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
+    {
+        glfwSetWindowShouldClose(window, true);
+    }
 }
 
