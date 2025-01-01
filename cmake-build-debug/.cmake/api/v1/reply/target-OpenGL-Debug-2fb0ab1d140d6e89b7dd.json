@@ -32,13 +32,25 @@
 			{
 				"command" : 0,
 				"file" : 0,
-				"line" : 46,
+				"line" : 37,
 				"parent" : 0
 			},
 			{
 				"command" : 1,
 				"file" : 0,
-				"line" : 76,
+				"line" : 66,
+				"parent" : 0
+			},
+			{
+				"command" : 2,
+				"file" : 0,
+				"line" : 41,
+				"parent" : 0
+			},
+			{
+				"command" : 2,
+				"file" : 0,
+				"line" : 52,
 				"parent" : 0
 			},
 			{
@@ -48,33 +60,21 @@
 				"parent" : 0
 			},
 			{
-				"command" : 2,
-				"file" : 0,
-				"line" : 62,
-				"parent" : 0
-			},
-			{
-				"command" : 2,
-				"file" : 0,
-				"line" : 61,
-				"parent" : 0
-			},
-			{
 				"command" : 3,
 				"file" : 0,
-				"line" : 68,
+				"line" : 58,
 				"parent" : 0
 			},
 			{
 				"command" : 4,
 				"file" : 0,
-				"line" : 48,
+				"line" : 39,
 				"parent" : 0
 			},
 			{
 				"command" : 5,
 				"file" : 0,
-				"line" : 66,
+				"line" : 56,
 				"parent" : 0
 			}
 		]
@@ -177,11 +177,11 @@
 		},
 		{
 			"backtrace" : 2,
-			"id" : "imgui::@0e4bebfa6e0abb85058b"
+			"id" : "raudio::@1df9a5823cc1f60ecd48"
 		},
 		{
 			"backtrace" : 2,
-			"id" : "raudio::@1df9a5823cc1f60ecd48"
+			"id" : "imgui::@0e4bebfa6e0abb85058b"
 		}
 	],
 	"id" : "OpenGL::@6890427a1f51a3e7e1df",
